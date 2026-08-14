@@ -305,20 +305,41 @@ function showTab(tabId){
 function toggleRadar() {
     const container = document.getElementById('radarContainer');
     const btn = document.getElementById('btnAgregarRes');
-    
+
     if (container.style.display === 'none') {
         container.style.display = 'block';
-        btn.innerHTML = '❌ Cerrar Captura';
+        btn.innerHTML = '❌ Cancelar Captura';
         btn.style.background = '#c0392b';
     } else {
+        // Cancelación manual: solo cerrar el formulario
         container.style.display = 'none';
         btn.innerHTML = '➕ Capturar Resultado';
         btn.style.background = '#145a32';
-        
-        document.getElementById("resultsContainer").innerHTML = "<p style='text-align:center; font-weight:bold; opacity: 0.8;'>🔄 Sincronizando nuevos resultados...</p>";
-        setTimeout(() => { inicializar(); }, 3500);
     }
 }
+
+function cerrarCapturaYSincronizar() {
+    const container = document.getElementById('radarContainer');
+    const btn = document.getElementById('btnAgregarRes');
+
+    container.style.display = 'none';
+    btn.innerHTML = '➕ Capturar Resultado';
+    btn.style.background = '#145a32';
+
+    document.getElementById("resultsContainer").innerHTML =
+        "<p style='text-align:center; font-weight:bold; opacity: 0.8;'>🔄 Sincronizando nuevos resultados...</p>";
+
+    setTimeout(() => {
+        inicializar();
+    }, 3500);
+}
+window.addEventListener("message", function(event) {
+    if (!event.data || event.data.tipo !== "SMP_RESULTADO_GUARDADO") {
+        return;
+    }
+
+    cerrarCapturaYSincronizar();
+});
 
 function toggleRadarPlayoffs() {
     const container = document.getElementById('radarContainerPlayoffs');
