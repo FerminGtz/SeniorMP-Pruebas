@@ -162,7 +162,15 @@
             <div class="registration-help">Escribe tu nombre completo, incluyendo apellidos.</div>
 
             <label class="registration-label" for="regTelefono">Número de teléfono</label>
-            <input type="tel" id="regTelefono" placeholder="Teléfono / WhatsApp" autocomplete="tel">
+            <input type="tel"
+               id="regTelefono"
+               placeholder="10 dígitos"
+               autocomplete="tel"
+               inputmode="numeric"
+               maxlength="10"
+               pattern="[0-9]{10}"
+               oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
+        <div class="registration-help">Captura exactamente 10 dígitos, sin espacios ni guiones.</div>
 
             <label class="registration-label" for="regEmail">Correo electrónico</label>
             <input type="email" id="regEmail" placeholder="Correo electrónico" autocomplete="email">
@@ -323,10 +331,26 @@ async function enviarInscripcion() {
     const correo = document.getElementById("regEmail").value.trim();
     const ghin = document.getElementById("regGhin").value.trim();
 
-    if (!nombre || !telefono || !correo || !ghin) {
-        alert("Por favor completa todos los datos de inscripción.");
-        return;
-    }
+    // Validar campos obligatorios
+if (!nombre || !telefono || !correo || !ghin) {
+    alert("Por favor completa todos los datos de inscripción.");
+    return;
+}
+
+// Validar teléfono: exactamente 10 dígitos
+if (!/^\d{10}$/.test(telefono)) {
+    alert("El número de teléfono debe contener exactamente 10 dígitos.");
+    document.getElementById("regTelefono").focus();
+    return;
+}
+
+// Validar formato del correo electrónico
+const formatoCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+if (!formatoCorreo.test(correo)) {
+    alert("Por favor captura un correo electrónico válido.");
+    document.getElementById("regEmail").focus();
+    return;
+}
 
     const boton = document.querySelector(".mercadoPagoBtn");
     boton.disabled = true;
