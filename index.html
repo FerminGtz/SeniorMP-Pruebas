@@ -173,7 +173,7 @@
             <div class="payment-block">
                 <div style="font-weight:bold; color:#145a32; margin-bottom:4px;">Pago de inscripción</div>
                 <div style="font-size:12px; opacity:0.72;">El pago se realizará desde esta misma pantalla.</div>
-                <button class="mercadoPagoBtn" type="button" disabled>Pagar con Mercado Pago</button>
+                <button class="mercadoPagoBtn" type="button" onclick="enviarInscripcion()">Pagar con Mercado Pago</button>
             </div>
 
             <div class="access-link">¿Ya estás inscrito? <a onclick="mostrarLogin()">Ingresar al portal</a></div>
@@ -317,6 +317,53 @@ function mostrarLogin() {
     document.getElementById("loginPanel").style.display = "block";
 }
 
+async function enviarInscripcion() {
+    const nombre = document.getElementById("regNombre").value.trim();
+    const telefono = document.getElementById("regTelefono").value.trim();
+    const correo = document.getElementById("regEmail").value.trim();
+    const ghin = document.getElementById("regGhin").value.trim();
+
+    if (!nombre || !telefono || !correo || !ghin) {
+        alert("Por favor completa todos los datos de inscripción.");
+        return;
+    }
+
+    const boton = document.querySelector(".mercadoPagoBtn");
+    boton.disabled = true;
+    boton.innerText = "Procesando inscripción...";
+
+    try {
+        const url = "https://script.google.com/macros/s/AKfycbzFnqOiB20PJ3b3c1uuoKzVnLXVTcg1DRsQKqQITd5nJMLZ6476JqfEJcPMSsOYCxNYxw/exec";
+
+        const respuesta = await fetch(url, {
+            method: "POST",
+            body: new URLSearchParams({
+                accion: "registrarInscrito",
+                nombre: nombre,
+                telefono: telefono,
+                correo: correo,
+                ghin: ghin
+            })
+        });
+
+        const resultado = await respuesta.text();
+
+        if (resultado.trim() === "Éxito") {
+            mostrarConfirmacionInscripcion();
+        } else {
+            alert(resultado);
+            boton.disabled = false;
+            boton.innerText = "Pagar con Mercado Pago";
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("No fue posible registrar la inscripción. Intenta nuevamente.");
+        boton.disabled = false;
+        boton.innerText = "Pagar con Mercado Pago";
+    }
+}
+        
 function mostrarConfirmacionInscripcion() {
     document.getElementById("registrationFormView").style.display = "none";
     document.getElementById("registrationThankYou").style.display = "block";
